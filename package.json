@@ -2,7 +2,7 @@
   "name": "codingame-node",
   "version": "0.0.1",
   "description": "A Node.js wrapper for the Codingame api",
-  "main": "Source/index.js",
+  "main": "Build/index.js",
   "scripts": {
     "test": "node Source/index.js",
     "build": "terser Source/index.js -c -m -o Build/index.js"
