@@ -14,9 +14,7 @@
   "author": "AsyncBanana",
   "license": "MIT",
   "dependencies": {
-    "fetch-cookie": "^0.11.0",
-    "node-fetch": "^2.6.1",
-    "tough-cookie": "^4.0.0"
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",

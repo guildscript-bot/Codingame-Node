@@ -1,11 +1,17 @@
-const Tough = require("tough-cookie");
-const NodeFetch = require("node-fetch");
-const Fetch = require("fetch-cookie")(NodeFetch, new Tough.CookieJar());
+const fetch = require('node-fetch')
+function parseCookies(response) {
+  const raw = response.headers.raw()['set-cookie'];
+  return raw.map((entry) => {
+    const parts = entry.split(';');
+    const cookiePart = parts[0];
+    return cookiePart;
+  }).join(';');
+}
 module.exports = class Client {
   async Login(Options) {
     let parsedRes = {};
     try {
-      const res = await Fetch(
+      const res = await fetch(
         "https://www.codingame.com/services/Codingamer/loginSiteV2",
         {
           method: "POST",
@@ -13,6 +19,7 @@ module.exports = class Client {
         }
       );
       parsedRes = await res.json();
+      this.Cookies = parseCookies(res)
     } catch (err) {
       console.warn("There was an error when logging in Error:", err);
       return err;
@@ -25,7 +32,7 @@ module.exports = class Client {
   }
   async FindCodinGamer(id) {
     try {
-    const Results = await Fetch(
+    const Results = await fetch(
       "https://www.codingame.com/services/CodinGamer/findCodingamerFollowCard",
       {
         method: "POST",
@@ -47,8 +54,9 @@ module.exports = class Client {
       console.warn("You must be logged in to create clashes");
       return;
     }
+    
     try {
-      const Results = await Fetch(
+      const Results = await fetch(
         "https://www.codingame.com/services/ClashOfCode/createPrivateClash",
         {
           method: "POST",
@@ -58,6 +66,10 @@ module.exports = class Client {
             [],
             Modes || ["FASTEST", "SHORTEST", "REVERSE"],
           ]),
+          headers: {
+            credentials: "same-origin",
+            cookie: this.Cookies
+          }
         }
       );
       return await Results.json();
@@ -70,7 +82,7 @@ module.exports = class Client {
   }
   async GetClash(handle) {
     try {
-      const Results = await Fetch(
+      const Results = await fetch(
         "https://www.codingame.com/services/ClashOfCode/findClashByHandle",
         {
           method: "POST",
@@ -93,7 +105,7 @@ module.exports = class Client {
       return
     }
     try {
-      const Results = await Fetch("https://www.codingame.com/services/Notification/findUnreadNotifications",{
+      const Results = await fetch("https://www.codingame.com/services/Notification/findUnreadNotifications",{
         method: 'POST',
         body: [this.UserId]
       })
@@ -107,7 +119,7 @@ module.exports = class Client {
   }
   async Search(Term){
     try {
-      const Results = await Fetch("https://www.codingame.com/services/search/search",{
+      const Results = await fetch("https://www.codingame.com/services/search/search",{
         method: 'POST',
         body: JSON.stringify([Term,"en",null])
       })
@@ -117,6 +129,29 @@ module.exports = class Client {
         "Something went wrong when trying to search Error:",
         err
       )
+    }
+  }
+  async GetUserByHandle(handle){
+    try {
+      const User = await (await fetch("https://www.codingame.com/services/CodinGamer/findCodingamePointsStatsByHandle",{
+        method: 'POST',
+        body: JSON.stringify([handle])
+      })).json()
+      return User
+    } catch(e){
+      console.warn("Something went wrong when retrieving Codingamer by handle",handle,"Error:",e)
+    }
+  }
+  async GetUserByName(Name){
+    const Results = await this.Search(Name)
+    if (Results!=null){
+      for (const Res of Results){
+        if (Res.type==="USER"&&Res.name===Name){
+          return await this.GetUserByHandle(Res.id)
+        } else {
+          return "No user found"
+        }
+      }
     }
   }
   constructor(Options) {
