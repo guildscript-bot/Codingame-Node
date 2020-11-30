@@ -2,11 +2,11 @@
   "name": "codingame-node",
   "version": "0.0.1",
   "description": "A Node.js wrapper for the Codingame api",
-  "main": "Build/index.js",
+  "main": "Build/index.cjs",
   "module": "Build/index.js",
   "scripts": {
     "test": "node Source/index.js",
-    "build": "terser Source/index.js -c -m -o Build/index.js"
+    "build": "rollup --config"
   },
   "keywords": [
     "Codingame",
@@ -20,7 +20,11 @@
   "devDependencies": {
     "dotenv": "^8.2.0",
     "eslint": "^7.13.0",
+    "rollup-plugin-terser": "^7.0.2",
     "terser": "^5.5.1"
   },
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "url": "https://github.com/guildscript-bot/Codingame-Node"
+  }
 }

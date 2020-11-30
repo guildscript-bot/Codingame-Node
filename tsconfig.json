@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "declaration": true,
+    "alwaysStrict": true,
+    "declarationDir": "@types",
+    "target": "ES6",
+    "moduleResolution": "node",
+    "outDir": "Build",
+    "removeComments": true,
+    "module": "commonJS"
+  },
+  "include": ["Source"]
+}

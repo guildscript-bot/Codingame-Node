@@ -31,6 +31,7 @@ export default class Client {
     }
     this.User = parsedRes;
     this.UserId = parsedRes.userId;
+    return parsedRes
   }
   async FindCodinGamer(id) {
     try {
@@ -99,7 +100,7 @@ export default class Client {
     }
   }
   async GetNotifications() {
-    if (!this.userId) {
+    if (!this.UserId) {
       console.log("You must be logged in to check notifications");
       return;
     }
