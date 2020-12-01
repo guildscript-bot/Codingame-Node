@@ -1,4 +1,6 @@
 import {terser} from 'rollup-plugin-terser'
+import {builtinModules} from 'module';
+import {dependencies} from './package.json';
 export default {
   input: 'Source/index.js',
   output: [{
@@ -12,4 +14,5 @@ export default {
     plugins: []
   }],
   plugins: [terser()],
+  external: [...builtinModules, ...Object.keys(dependencies)]
 };

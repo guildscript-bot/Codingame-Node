@@ -29,9 +29,24 @@ export default class Client {
     if (!parsedRes.userId) {
       console.warn("No userId was found in the login result:", parsedRes);
     }
-    this.User = parsedRes;
-    this.UserId = parsedRes.userId;
-    return parsedRes
+    const user = {
+      pseudo: parsedRes.codinGamer.pseudo,
+      userId: parsedRes.codinGamer.userId,
+      email: parsedRes.codinGamer.email,
+      countryId: parsedRes.codingamer.countryId,
+      publicHandle: parsedRes.codingamer.publicHandle,
+      formValues: parsedRes.codingamer.formValues,
+      enable: parsedRes.codingamer.enable,
+      rank: parsedRes.codingamer.rank,
+      tagline: parsedRes.codingamer.tagline,
+      company: parsedRes.codingamer.company,
+      level: parsedRes.codingamer.level,
+      xp: parsedRes.codingamer.xp,
+      category: parsedRes.codingamer.category
+    }
+    this.User = user;
+    this.UserId = user;
+    return user
   }
   async FindCodinGamer(id) {
     try {
@@ -145,7 +160,7 @@ export default class Client {
           }
         )
       ).json();
-      return User;
+      return User.codinGamer;
     } catch (e) {
       console.warn(
         "Something went wrong when retrieving Codingamer by handle",
@@ -160,7 +175,7 @@ export default class Client {
     if (Results != null) {
       for (const Res of Results) {
         if (Res.type === "USER" && Res.name === Name) {
-          return await this.GetUserByHandle(Res.id);
+          return (await this.GetUserByHandle(Res.id)).codinGamer;
         } else {
           return "No user found";
         }
@@ -176,7 +191,7 @@ export default class Client {
           body: JSON.stringify([]),
         }
       );
-      return await Res.json();
+      return (await Res.json()).codinGamer;
     } catch (err) {
       console.warn("Something went wrong when getting pending clashes", err);
     }

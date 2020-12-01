@@ -1,9 +1,13 @@
 {
   "name": "codingame-node",
   "version": "0.0.1",
-  "description": "A Node.js wrapper for the Codingame api",
+  "description": "A <5kb single dependency Node.js wrapper for the Codingame api",
   "main": "Build/index.cjs",
   "module": "Build/index.js",
+  "homepage": "https://github.com/guildscript-bot/Codingame-Node",
+  "bugs":{
+    "url": "https://github.com/guildscript-bot/Codingame-Node/issues"
+  },
   "scripts": {
     "test": "node Source/index.js",
     "build": "rollup --config"
@@ -25,6 +29,7 @@
   },
   "type": "module",
   "repository": {
+    "type": "git",
     "url": "https://github.com/guildscript-bot/Codingame-Node"
   }
 }
