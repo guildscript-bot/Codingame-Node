@@ -175,9 +175,9 @@ export default class Client {
     if (Results != null) {
       for (const Res of Results) {
         if (Res.type === "USER" && Res.name === Name) {
-          return (await this.GetUserByHandle(Res.id)).codinGamer;
+          return (await this.GetUserByHandle(Res.id));
         } else {
-          return "No user found";
+          return
         }
       }
     }

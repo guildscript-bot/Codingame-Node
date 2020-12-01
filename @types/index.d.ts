@@ -27,7 +27,7 @@ export default class Client {
     GetNotifications(): Promise<any>;
     Search(Term: string): Promise<any>;
     GetUserByHandle(handle: string): Promise<codingamer>;
-    GetUserByName(Name: any): Promise<codingamer | "No user found">;
+    GetUserByName(Name: any): Promise<codingamer>;
     GetPendingClashes(): Promise<any>;
     constructor(Options: {
         Email: string;
