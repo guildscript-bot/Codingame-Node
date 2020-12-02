@@ -1,4 +1,4 @@
-interface codingamer {
+interface user {
     pseudo: string;
     userId: number;
     email: string;
@@ -13,25 +13,31 @@ interface codingamer {
     xp: number;
     category: string;
 }
+interface userResult {
+    valid: boolean;
+    user: user;
+}
 export default class Client {
-    Cookies: string;
-    UserId: number;
-    User: codingamer;
+    cookies: string;
+    userId: number;
+    user: user;
     Login(Options: {
         Email: string;
         Password: string;
-    }): Promise<codingamer>;
-    FindCodinGamer(id: string): Promise<codingamer>;
+        LoadUser: boolean;
+    });
+    GetUserById(id: string): Promise<userResult>;
     CreateClash(Modes: Array<string>): Promise<any>;
     GetClash(handle: string): Promise<any>;
     GetNotifications(): Promise<any>;
     Search(Term: string): Promise<any>;
-    GetUserByHandle(handle: string): Promise<codingamer>;
-    GetUserByName(Name: any): Promise<codingamer | "No user found">;
+    GetUserByHandle(handle: string): Promise<userResult>;
+    GetUserByName(Name: any): Promise<userResult>;
     GetPendingClashes(): Promise<any>;
     constructor(Options: {
         Email: string;
         Password: string;
+        LoadUser: boolean;
     });
 }
 export {};

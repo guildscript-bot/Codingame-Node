@@ -21,7 +21,7 @@ export default class Client {
         }
       );
       parsedRes = await res.json();
-      this.Cookies = parseCookies(res);
+      this.cookies = parseCookies(res);
     } catch (err) {
       console.warn("There was an error when logging in Error:", err);
       return err;
@@ -29,35 +29,35 @@ export default class Client {
     if (!parsedRes.userId) {
       console.warn("No userId was found in the login result:", parsedRes);
     }
-    const user = {
-      pseudo: parsedRes.codinGamer.pseudo,
-      userId: parsedRes.codinGamer.userId,
-      email: parsedRes.codinGamer.email,
-      countryId: parsedRes.codingamer.countryId,
-      publicHandle: parsedRes.codingamer.publicHandle,
-      formValues: parsedRes.codingamer.formValues,
-      enable: parsedRes.codingamer.enable,
-      rank: parsedRes.codingamer.rank,
-      tagline: parsedRes.codingamer.tagline,
-      company: parsedRes.codingamer.company,
-      level: parsedRes.codingamer.level,
-      xp: parsedRes.codingamer.xp,
-      category: parsedRes.codingamer.category
+    this.userId = parsedRes.userId;
+    if (Options.LoadUser) {
+      const user = await this.GetUserById(parsedRes.codinGamer.publicHandle);
+      if (user.valid){
+        this.user = user.user
+      } else {
+        console.log("Unknown Error!")
+      }
     }
-    this.User = user;
-    this.UserId = user;
-    return user
   }
-  async FindCodinGamer(id) {
+  async GetUserById(id) {
     try {
       const Results = await fetch(
         "https://www.codingame.com/services/CodinGamer/findCodingamerFollowCard",
         {
           method: "POST",
-          body: JSON.stringify([id, this.UserId]),
+          body: JSON.stringify([id, this.userId]),
+          headers: {
+            cookie: this.cookies
+          }
         }
       );
-      return await Results.json();
+      const ResJSON = await Results.json();
+      console.log(ResJSON)
+      if (ResJSON&&ResJSON.publicHandle){
+        return await this.GetUserByHandle(ResJSON.publicHandle);
+      } else {
+        return {valid: false}
+      }
     } catch (err) {
       console.warn(
         "Something went wrong when getting info on Codingamer",
@@ -65,6 +65,7 @@ export default class Client {
         "Error:",
         err
       );
+      return {valid: false}
     }
   }
   async CreateClash(Modes) {
@@ -85,8 +86,7 @@ export default class Client {
             Modes || ["FASTEST", "SHORTEST", "REVERSE"],
           ]),
           headers: {
-            credentials: "same-origin",
-            cookie: this.Cookies,
+            cookie: this.cookies
           },
         }
       );
@@ -115,7 +115,7 @@ export default class Client {
     }
   }
   async GetNotifications() {
-    if (!this.UserId) {
+    if (!this.userId) {
       console.log("You must be logged in to check notifications");
       return;
     }
@@ -124,7 +124,7 @@ export default class Client {
         "https://www.codingame.com/services/Notification/findUnreadNotifications",
         {
           method: "POST",
-          body: [this.UserId],
+          body: [this.userId],
         }
       );
       return await Results.json();
@@ -160,7 +160,10 @@ export default class Client {
           }
         )
       ).json();
-      return User.codinGamer;
+      if (!User.codingamer) {
+        return { valid: false };
+      }
+      return { user: User.codingamer, valid: true };
     } catch (e) {
       console.warn(
         "Something went wrong when retrieving Codingamer by handle",
@@ -175,9 +178,9 @@ export default class Client {
     if (Results != null) {
       for (const Res of Results) {
         if (Res.type === "USER" && Res.name === Name) {
-          return (await this.GetUserByHandle(Res.id)).codinGamer;
+          return await this.GetUserByHandle(Res.id);
         } else {
-          return "No user found";
+          return { valid: false };
         }
       }
     }
@@ -191,14 +194,14 @@ export default class Client {
           body: JSON.stringify([]),
         }
       );
-      return (await Res.json()).codinGamer;
+      return await Res.json()
     } catch (err) {
       console.warn("Something went wrong when getting pending clashes", err);
     }
   }
   constructor(Options) {
     if (Options && Options.Email && Options.Password) {
-      this.Login({ Email: Options.Email, Password: Options.Password });
+      this.Login({ Email: Options.Email, Password: Options.Password, LoadUser: Options.LoadUser });
     }
   }
 }
