@@ -31,11 +31,11 @@ export default class Client {
     }
     this.userId = parsedRes.userId;
     if (Options.LoadUser) {
-      const user = await this.GetUserById(parsedRes.codinGamer.publicHandle);
+      const user = await this.GetUserByHandle(parsedRes.codinGamer.publicHandle);
       if (user.valid){
-        this.user = user.user
+        this.user = user.result
       } else {
-        console.log("Unknown Error!")
+        return {valid: false, error: new Error("Unknown Error!")}
       }
     }
   }
@@ -52,26 +52,18 @@ export default class Client {
         }
       );
       const ResJSON = await Results.json();
-      console.log(ResJSON)
       if (ResJSON&&ResJSON.publicHandle){
-        return await this.GetUserByHandle(ResJSON.publicHandle);
+        return await this.GetUserByHandle(ResJSON.publicHandle)
       } else {
-        return {valid: false}
+        return {valid: false, error: new Error("Not found")}
       }
     } catch (err) {
-      console.warn(
-        "Something went wrong when getting info on Codingamer",
-        id,
-        "Error:",
-        err
-      );
-      return {valid: false}
+      return {valid: false, error: err}
     }
   }
   async CreateClash(Modes) {
     if (!this.UserId) {
-      console.warn("You must be logged in to create clashes");
-      return;
+      return {valid: false, error: new Error("You must be logged in to create clashes")}
     }
 
     try {
@@ -90,9 +82,9 @@ export default class Client {
           },
         }
       );
-      return await Results.json();
+      return {result: await Results.json(), valid: true}
     } catch (err) {
-      console.warn("Something went wrong when creating clash Error:", err);
+      return {valid: false, error: err}
     }
   }
   async GetClash(handle) {
@@ -104,20 +96,14 @@ export default class Client {
           body: JSON.stringify([handle]),
         }
       );
-      return await Results.json();
+      return {result: await Results.json(), valid: true}
     } catch (err) {
-      console.warn(
-        "Something went wrong when getting info on clash",
-        handle,
-        "Error:",
-        err
-      );
+      return {valid: false, error: err}
     }
   }
   async GetNotifications() {
     if (!this.userId) {
-      console.log("You must be logged in to check notifications");
-      return;
+      return {valid: false, error: new Error("You must be logged in to check notifications")}
     }
     try {
       const Results = await fetch(
@@ -127,12 +113,9 @@ export default class Client {
           body: [this.userId],
         }
       );
-      return await Results.json();
+      return {result: await Results.json(), valid: true}
     } catch (err) {
-      console.warn(
-        "Something went wrong when retrieving client notifications Error:",
-        err
-      );
+      return {valid: false, error: err}
     }
   }
   async Search(Term) {
@@ -144,9 +127,9 @@ export default class Client {
           body: JSON.stringify([Term, "en", null]),
         }
       );
-      return await Results.json();
+      return {result: await Results.json(), valid: true}
     } catch (err) {
-      console.warn("Something went wrong when trying to search Error:", err);
+      return {valid: false, error: err}
     }
   }
   async GetUserByHandle(handle) {
@@ -161,16 +144,11 @@ export default class Client {
         )
       ).json();
       if (!User.codingamer) {
-        return { valid: false };
+        return { valid: false, error: new Error("User not found") };
       }
-      return { user: User.codingamer, valid: true };
+      return { result: User.codingamer, valid: true };
     } catch (e) {
-      console.warn(
-        "Something went wrong when retrieving Codingamer by handle",
-        handle,
-        "Error:",
-        e
-      );
+      return {valid: false, error: e}
     }
   }
   async GetUserByName(Name) {
@@ -178,9 +156,9 @@ export default class Client {
     if (Results != null) {
       for (const Res of Results) {
         if (Res.type === "USER" && Res.name === Name) {
-          return await this.GetUserByHandle(Res.id);
+          return {result: await this.GetUserByHandle(Res.id), valid: true}
         } else {
-          return { valid: false };
+          return { valid: false, error: new Error("User not found") };
         }
       }
     }
@@ -194,9 +172,9 @@ export default class Client {
           body: JSON.stringify([]),
         }
       );
-      return await Res.json()
+      return {result: await Res.json(), valid: true}
     } catch (err) {
-      console.warn("Something went wrong when getting pending clashes", err);
+      return {valid: false, error: err}
     }
   }
   constructor(Options) {

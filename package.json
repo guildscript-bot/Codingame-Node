@@ -14,7 +14,8 @@
   },
   "keywords": [
     "Codingame",
-    "Node.js"
+    "Node.js",
+    "API Wrapper"
   ],
   "author": "AsyncBanana",
   "license": "MIT",
